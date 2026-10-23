@@ -104,8 +104,13 @@ References: [conversion tests](../tests/unit/pretrained_weight_conversions/),
 - [ ] Validate a split into three runtime-balanced acceptance shards on separate
   runners. Preserve required Python 3.10, 3.11, and 3.12 coverage; this can require
   nine jobs if each version runs all three shards.
-- [ ] Compare the sharded and unsharded test inventories on the same commit.
-  Confirm no required cases are omitted and record skips separately.
+- [ ] Require sharded and unsharded runs on the same candidate commit and matching
+  environments to match exact parametrized test IDs and execution outcomes for
+  each Python version, with every selected test assigned to exactly one shard.
+  Account explicitly for skipped, deselected, expected-failing, and quarantined
+  tests, including runtime skip reasons; matching counts or green jobs alone are
+  insufficient. Resolve missing cases or outcome differences before adopting the
+  split; required skipped or quarantined checks still need passing evidence.
 - [ ] Keep tests sharing a checkpoint together where practical. Run model
   verification sequentially within each runner; do not share one accelerator
   across concurrent verification jobs.

@@ -9,6 +9,28 @@ Candidate commit: __________
 Evidence location (access appropriate to its contents): __________  
 Release owner: Bram; CI and security readiness: Yusuke
 
+## Current CI coverage
+
+This describes the configured workflows, not proof that a candidate passed or
+that branch/tag protection requires these checks.
+
+- **Automated today:** [CI](../.github/workflows/checks.yml) checks lockfile
+  consistency, runs non-slow unit and acceptance tests on Python 3.10/3.11/3.12,
+  and runs build, formatting, type, docstring, benchmark, and coverage jobs.
+  Notebook checks cover a subset in the locked environment; token-dependent
+  notebooks can skip successfully. Slow and quarantined tests are not certified
+  by a green run, nor is completion of every CSV or supplementary conversion gate.
+- **Proposed, not automated:** the three-runner acceptance shard plan in section 3,
+  its completeness checks, and the full latest-stable-Transformers notebook
+  sweep in section 4. The current three Python-version jobs are not test shards.
+  Until implemented, collect the required verification evidence separately.
+- **Manual today:** review per-family conversion evidence and required external
+  runs; review `pyproject.toml` and release scope; complete restricted security
+  review; and approve the exact candidate commit before tagging.
+- **Publishing boundary:** [publishing](../.github/workflows/release.yml) waits
+  for the checks workflow before PyPI upload, but starts only after a GitHub
+  Release is published. It does not enforce pre-tag or pre-publication sign-off.
+
 ## 1. Confirm scope
 
 - [ ] Include only merged, reviewed changes. For the July plan, confirm the

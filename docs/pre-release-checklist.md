@@ -32,7 +32,7 @@ Release owner: Bram; CI and security readiness: Yusuke
 - [ ] Compare HF and the affected TransformerLens loading path on the smallest
   appropriate public checkpoint with matching FP32/eager settings, token IDs,
   evaluation mode, and pinned checkpoint revision.
-- [ ] Test short and longer prompts, including the Gemma-3 regression. Require
+- [ ] Test short and longer prompts, including the Gemma-3 regression (release-triage issue `#1121`). Require
   maximum absolute raw-logit error <= `1e-4` on the unprocessed path, without a
   relative-tolerance allowance. Check selected intermediate activations against
   explicit tolerances.

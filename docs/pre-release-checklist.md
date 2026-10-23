@@ -19,23 +19,51 @@ Release owner: Bram; CI and security readiness: Yusuke
 
 ## 2. Conversion and acceptance
 
-- [ ] Verify norm epsilon values and placement inside the square root, including
-  QK, extra, and final norms. Confirm the regression test fails with the incorrect
-  epsilon placement.
+### CSV baseline: mandatory conversion checks
+
+The original `weight_conversion_checklist.csv` lists these eight checks for each
+of LLaMA-4, Qwen-3, Mistral-Small-3, Gemma-3, and Qwen-2.5-VL. Record results
+separately for each family included in the release verification scope from
+section 1. Selecting affected families is a release-scoping decision, not a
+condition specified by the CSV.
+
+- [ ] Read `head_dim` from the source model config; preserve its explicit value.
+- [ ] Verify GQA KV-head repetition or equivalent broadcasting, including correct
+  head ordering; matching tensor shapes alone is insufficient.
+- [ ] Verify the RoPE variant and theta.
+- [ ] Verify norm epsilon is inside `rsqrt`: equivalently, inside the
+  normalization denominator's square root.
+- [ ] Map QK-norm tensors **if present**.
+- [ ] Apply embedding scaling **if present**.
+- [ ] Verify tied/untied embeddings match the source model.
+- [ ] Pass the `1e-4` acceptance threshold.
+
+Only QK-norm mapping and embedding scaling are conditional in the CSV. Record
+why either is absent when marking it not applicable; do not use that option to
+waive the other six checks.
+
+### Supplementary conversion and acceptance gates
+
+These checks strengthen the CSV baseline with the agreed release-verification
+requirements. They are additions, not requirements stated in the CSV. The scope,
+CI, notebook, security, and sign-off steps elsewhere in this checklist are also
+supplementary release-process gates.
+
+- [ ] Verify epsilon values reach all relevant norms, including QK, extra, and
+  final norms. Confirm the regression test fails with incorrect epsilon placement.
 - [ ] Verify intentional dtype behavior for converted and loaded weights, synthetic
   biases, and outputs. Document intentional FP32 norm calculations; do not require
   all tensors to have identical dtypes.
-- [ ] Preserve explicit `head_dim` and test a configuration where it differs from
-  `hidden_size / num_attention_heads`. Check Q/O and GQA K/V dimensions and ordering.
-- [ ] Verify RoPE settings, local/global attention, required norm tensors, embedding
-  scaling, and tied/untied embeddings. Give a reason for each inapplicable check.
+- [ ] Test a configuration where `head_dim` differs from
+  `hidden_size / num_attention_heads`. Check Q/O and GQA K/V dimensions.
+- [ ] Verify local/global attention and any additional required norm tensors.
 - [ ] Compare HF and the affected TransformerLens loading path on the smallest
   appropriate public checkpoint with matching FP32/eager settings, token IDs,
   evaluation mode, and pinned checkpoint revision.
-- [ ] Test short and longer prompts, including the Gemma-3 regression (release-triage issue `#1121`). Require
-  maximum absolute raw-logit error <= `1e-4` on the unprocessed path, without a
-  relative-tolerance allowance. Check selected intermediate activations against
-  explicit tolerances.
+- [ ] Test short and longer prompts, including the Gemma-3 regression
+  (release-triage issue `#1121`). Apply the baseline threshold as maximum absolute
+  raw-logit error <= `1e-4` on the unprocessed path, without a relative-tolerance
+  allowance. Check selected intermediate activations against explicit tolerances.
 - [ ] Separately test weight processing. When processing intentionally shifts raw
   logits, compare log-probabilities with an explicitly justified tolerance.
 - [ ] If low-precision behavior changed, verify supported FP16/BF16 paths with
